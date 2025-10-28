@@ -66,6 +66,7 @@ define(['backbone', 'preps/indexeddb'], function (BB) {
             autoremove: false,
             autoremovesetting: 'KEEP_UNREAD',
             autoremovetrash: 0,
+            emptyTrashOnClose: false,
             openNewTab: 'background',
             userStyle: '',
             defaultStyle: ':root {\n' +
