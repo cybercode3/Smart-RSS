@@ -38,6 +38,15 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
         );
     }
 
+    function getXmlUrl(outline) {
+        return (
+            outline.getAttribute("xmlUrl") ||
+            outline.getAttribute("xmlurl") ||
+            outline.getAttribute("url") ||
+            ""
+        );
+    }
+
     JSON.safeParse = function (str) {
         try {
             return JSON.parse(str);
@@ -572,6 +581,22 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
         }, 20);
     }
 
+    function normalizeLegacySettings(data) {
+        if (!data) {
+            return data;
+        }
+
+        if (!data.settings && data.preferences) {
+            data.settings = data.preferences;
+        }
+
+        if (!data.settings && data.options) {
+            data.settings = data.options;
+        }
+
+        return data;
+    }
+
     function handleImportSettings(event) {
         const settingsImportStatus =
             document.querySelector("#settings-imported");
@@ -584,7 +609,7 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
 
         const reader = new FileReader();
         reader.onload = function () {
-            const data = JSON.safeParse(this.result);
+            const data = normalizeLegacySettings(JSON.safeParse(this.result));
 
             if (!data || !data.settings) {
                 settingsImportStatus.textContent = "Wrong file";
@@ -634,6 +659,24 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
         }
     }
 
+    function normalizeLegacySmart(data) {
+        if (!data) {
+            return data;
+        }
+
+        if (!data.items && data.articles) {
+            data.items = data.articles;
+        }
+        if (!data.sources && data.feeds) {
+            data.sources = data.feeds;
+        }
+        if (!data.folders && data.groups) {
+            data.folders = data.groups;
+        }
+
+        return data;
+    }
+
     function handleImportSmart(event) {
         const smartImportStatus = document.querySelector("#smart-imported");
         const file = event.target.files[0];
@@ -645,7 +688,7 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
 
         const reader = new FileReader();
         reader.onload = function () {
-            const data = JSON.safeParse(this.result);
+            const data = normalizeLegacySmart(JSON.safeParse(this.result));
 
             if (!data || !data.items || !data.sources) {
                 smartImportStatus.textContent = "Wrong file";
@@ -720,7 +763,7 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
 
             [...feeds].forEach((feed) => {
                 if (!feed.hasAttribute("xmlUrl")) {
-                    const subFeeds = feed.querySelectorAll("outline[xmlUrl]");
+                    const subFeeds = feed.querySelectorAll("outline[xmlUrl], outline[xmlurl], outline[url]");
                     const folderTitle = decodeHTML(
                         feed.getAttribute("title") || feed.getAttribute("text")
                     );
@@ -740,11 +783,13 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
                     const folderId = folder.get("id");
 
                     [...subFeeds].forEach((subFeed) => {
-                        if (
-                            bg.sources.findWhere({
-                                url: decodeHTML(subFeed.getAttribute("xmlUrl")),
-                            })
-                        ) {
+                        const xmlUrl = decodeHTML(getXmlUrl(subFeed));
+
+                        if (!xmlUrl) {
+                            return;
+                        }
+
+                        if (bg.sources.findWhere({ url: xmlUrl })) {
                             return;
                         }
                         bg.sources.create(
@@ -753,7 +798,7 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
                                     subFeed.getAttribute("title") ||
                                         subFeed.getAttribute("text")
                                 ),
-                                url: decodeHTML(subFeed.getAttribute("xmlUrl")),
+                                url: xmlUrl,
                                 updateEvery: -1,
                                 folderID: folderId,
                             },
@@ -761,11 +806,13 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
                         );
                     });
                 } else {
-                    if (
-                        bg.sources.findWhere({
-                            url: decodeHTML(feed.getAttribute("xmlUrl")),
-                        })
-                    ) {
+                    const xmlUrl = decodeHTML(getXmlUrl(feed));
+
+                    if (!xmlUrl) {
+                        return;
+                    }
+
+                    if (bg.sources.findWhere({ url: xmlUrl })) {
                         return;
                     }
                     bg.sources.create(
@@ -774,7 +821,7 @@ define(["../app/staticdb/actions", "staticdb/shortcuts"], function (
                                 feed.getAttribute("title") ||
                                     feed.getAttribute("text")
                             ),
-                            url: decodeHTML(feed.getAttribute("xmlUrl")),
+                            url: xmlUrl,
                             updateEvery: -1,
                         },
                         { wait: true }
