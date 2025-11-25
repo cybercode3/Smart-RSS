@@ -57,16 +57,8 @@ function startSettingsImport() {
     const importedSettings = content.settings;
     if (importedSettings) {
         settings.clear();
-        const settingsList = Array.isArray(importedSettings)
-            ? importedSettings
-            : [importedSettings];
-
-        for (let i = 0, j = settingsList.length; i < j; i++) {
-            const record = settingsList[i].id
-                ? settingsList[i]
-                : { ...settingsList[i], id: "settings-id" };
-
-            handleReq(settings.put(record), "finished-settings");
+        for (let i = 0, j = importedSettings.length; i < j; i++) {
+            handleReq(settings.add(importedSettings[i]), "finished-settings");
             if (i % 10 === 0) {
                 postMessage({
                     action: "message-settings",
