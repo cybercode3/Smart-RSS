@@ -31,12 +31,12 @@ onmessage = function (e) {
 
 let writes = 0;
 
-function handleReq(req) {
+function handleReq(req, finishedAction = "finished") {
     writes++;
     req.onsuccess = req.onerror = function () {
         writes--;
         if (writes <= 0) {
-            postMessage({ action: "finished" });
+            postMessage({ action: finishedAction });
         }
     };
 }
@@ -49,7 +49,7 @@ function startSettingsImport() {
     if (importedSettings) {
         settings.clear();
         for (let i = 0, j = importedSettings.length; i < j; i++) {
-            handleReq(settings.add(importedSettings[i]));
+            handleReq(settings.add(importedSettings[i]), "finished-settings");
             if (i % 10 === 0) {
                 postMessage({
                     action: "message-settings",
