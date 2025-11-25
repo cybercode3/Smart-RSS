@@ -2,6 +2,7 @@ const request = indexedDB.open("backbone-indexeddb", 4);
 
 let db;
 let content;
+let importAction;
 
 request.addEventListener("error", function () {
     throw "Error code: " + this.errorCode;
@@ -10,19 +11,25 @@ request.addEventListener("error", function () {
 request.addEventListener("success", function () {
     db = this.result;
     if (content) {
-        startImport();
+        if (importAction === "settings") {
+            startSettingsImport();
+        } else {
+            startImport();
+        }
     }
 });
 
 onmessage = function (e) {
     if (e.data.action === "file-content") {
         content = e.data.value;
+        importAction = "file-content";
         if (db) {
             startImport();
         }
     }
     if (e.data.action === "settings") {
         content = e.data.value;
+        importAction = "settings";
         if (db) {
             startSettingsImport();
         }
@@ -31,25 +38,35 @@ onmessage = function (e) {
 
 let writes = 0;
 
-function handleReq(req) {
+function handleReq(req, finishedAction = "finished") {
     writes++;
     req.onsuccess = req.onerror = function () {
         writes--;
         if (writes <= 0) {
-            postMessage({ action: "finished" });
+            postMessage({ action: finishedAction });
         }
     };
 }
 
 function startSettingsImport() {
+    writes = 0;
+
     const transaction = db.transaction(["settings-backbone"], "readwrite");
     const settings = transaction.objectStore("settings-backbone");
 
     const importedSettings = content.settings;
     if (importedSettings) {
         settings.clear();
-        for (let i = 0, j = importedSettings.length; i < j; i++) {
-            handleReq(settings.add(importedSettings[i]));
+        const settingsList = Array.isArray(importedSettings)
+            ? importedSettings
+            : [importedSettings];
+
+        for (let i = 0, j = settingsList.length; i < j; i++) {
+            const record = settingsList[i].id
+                ? settingsList[i]
+                : { ...settingsList[i], id: "settings-id" };
+
+            handleReq(settings.put(record), "finished-settings");
             if (i % 10 === 0) {
                 postMessage({
                     action: "message-settings",
