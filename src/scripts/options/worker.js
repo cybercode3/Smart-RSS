@@ -2,6 +2,7 @@ const request = indexedDB.open("backbone-indexeddb", 4);
 
 let db;
 let content;
+let importAction;
 
 request.addEventListener("error", function () {
     throw "Error code: " + this.errorCode;
@@ -10,19 +11,25 @@ request.addEventListener("error", function () {
 request.addEventListener("success", function () {
     db = this.result;
     if (content) {
-        startImport();
+        if (importAction === "settings") {
+            startSettingsImport();
+        } else {
+            startImport();
+        }
     }
 });
 
 onmessage = function (e) {
     if (e.data.action === "file-content") {
         content = e.data.value;
+        importAction = "file-content";
         if (db) {
             startImport();
         }
     }
     if (e.data.action === "settings") {
         content = e.data.value;
+        importAction = "settings";
         if (db) {
             startSettingsImport();
         }
