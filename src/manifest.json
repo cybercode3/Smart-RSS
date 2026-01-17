@@ -1,11 +1,11 @@
 {
   "name": "Smart RSS",
   "developer": {
-    "name": "zakius"
+    "name": "cybercode3"
   },
   "description": "RSS Reader",
   "manifest_version": 2,
-  "version": "2.26.0",
+  "version": "2.27.0",
   "background": {
     "page": "index.html"
   },
@@ -63,7 +63,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "smart-rss@mozilla.firefox"
+      "id": "smart-rss-fork7123@mozilla.firefox"
     }
   }
 }
