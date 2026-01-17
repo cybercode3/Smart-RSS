@@ -1,6 +1,6 @@
 # Smart RSS extension
 
-## Now officially unmaintained, I _may_ fix some critical issue if any is found within few following weeks, but then I'll archive this repo. Feel free to fork and continue development as you wish
+## This is a fork of Smart-RSS. There’s no guarantee of active development, but anyone is welcome to use it if they find it helpful.
 
 Originally developed for Opera 15+ by BS-Harou (Martin Kadlec)
 
