@@ -31,6 +31,20 @@ define([
 
     browser.runtime.onMessage.addListener(onMessage);
 
+    window.addEventListener("beforeunload", () => {
+        if (!bg || !bg.items) {
+            return;
+        }
+        if (!bg.getBoolean("emptyTrashOnClose")) {
+            return;
+        }
+        bg.items
+            .where({ trashed: true, deleted: false })
+            .forEach((item) => {
+                item.markAsDeleted();
+            });
+    });
+
     function changeUserStyle() {
         const userStyle = bg.settings.get("userStyle");
         document.querySelector("[data-custom-style]").textContent = userStyle;
