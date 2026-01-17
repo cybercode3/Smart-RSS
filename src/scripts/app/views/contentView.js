@@ -325,6 +325,8 @@ define(function (require) {
                                     );
                                 const iframe =
                                     iframeEnclosure.querySelector("iframe");
+                                iframe.referrerPolicy =
+                                    "strict-origin-when-cross-origin";
                                 iframe.src = videoUrl;
                                 cover.replaceWith(iframeEnclosure);
                                 iframeEnclosure.focus();
