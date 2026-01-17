@@ -8,17 +8,6 @@ Translations are in scripts/nls/\*.js
 
 For technical bug reports use issues here on GitHub
 
-## For users
-
-Extension is available in following repositories:
-
-#### AMO: https://addons.mozilla.org/firefox/addon/smart-rss-reader/
-
-~#### Chrome Web Store: https://chrome.google.com/webstore/detail/eggggihfcaabljfpjiiaohloefmgejic/~
-
-If you encounter issue with a specific feed for best results please back up and include current state of that feed in your report, this will be helpful in case the feed changes before I get to check it, thanks in advance
-
-
 ## For developers
 
 If you are interested in improving Smart RSS then there are few tips to get started.
@@ -31,7 +20,7 @@ First of all you will need several command line tools:
 To setup your Smart RSS project open your console, go to your projects folders and type:
 
 ```
-git clone git@github.com:zakius/Smart-RSS.git smartrss
+git clone git@github.com:cybercode3/Smart-RSS.git smartrss
 cd smartrss
 npm install
 ```
